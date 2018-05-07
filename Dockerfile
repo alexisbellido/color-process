@@ -4,17 +4,13 @@ LABEL maintainer="Alexis Bellido <a@zinibu.com>"
 
 COPY requirements.txt /root/requirements.txt
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 WORKDIR /root
 
-# TODO create venv and use it for running Python script in container
-# TODO use SHELL or exec form of RUN
-# SHELL ["/bin/bash", "-c", "source /root/.venv/app/bin/activate"]
-RUN /bin/bash -c "pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt"
+SHELL ["/bin/bash", "-c"]
+RUN python -m venv /env \
+  && source /env/bin/activate \
+  && pip install --upgrade pip \
+  && pip install --no-cache-dir -r requirements.txt
 
-# how to pass python example.py to ENTRYPOINT and run in venv?
-# see SO bookmarked and try $@
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-
-# TODO CMD part, try passing default arguments to opython script here
-#CMD ["building"]
