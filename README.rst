@@ -13,4 +13,21 @@ TODO
 
 rebuild Docker image to use requirements.txt
 
-verify if colormath 3.0 is compatible. cooperhewitt-swatchbook 0.3 has requirement colormath<2.0, but you'll have colormath 3.0.0 which is incompatible.
+===
+
+download and process image with requests and cologram
+
+http://docs.python-requests.org/en/latest/user/quickstart/#binary-response-content
+https://github.com/obskyr/colorgram.py
+
+http://www.sciencekids.co.nz/pictures/flags.html
+http://www.sciencekids.co.nz/images/pictures/flags680/Benin.jpg
+http://www.sciencekids.co.nz/images/pictures/flags680/Argentina.jpg
+
+import colorgram
+import requests
+from PIL import Image
+from io import BytesIO
+r = requests.get('http://www.sciencekids.co.nz/images/pictures/flags680/Argentina.jpg')
+colors = colorgram.extract(BytesIO(r.content), 3)
+colors
