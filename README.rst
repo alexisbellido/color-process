@@ -1,6 +1,8 @@
 Python, Flask and color processing
 =======================================================================
 
+Process image colors with `requests <http://docs.python-requests.org/en/latest/user/quickstart/#binary-response-content>`_ and `cologram <https://github.com/obskyr/colorgram.py>`_
+
 .. code-block:: bash
 
   $ docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t alexisbellido/color-process:0.2 .
@@ -8,26 +10,11 @@ Python, Flask and color processing
 
 Also see `<https://github.com/alexisbellido/dockerize-django/tree/master/basic-python>`_.
 
+.. code-block:: bash
+
+  $ python colors.py --id 136300661 --url https://images.collection.cooperhewitt.org/221332_72430cf94a181603_z.jpg
+
 TODO
 --------------------------------------------------------
 
 rebuild Docker image to use requirements.txt
-
-===
-
-download and process image with requests and cologram
-
-http://docs.python-requests.org/en/latest/user/quickstart/#binary-response-content
-https://github.com/obskyr/colorgram.py
-
-http://www.sciencekids.co.nz/pictures/flags.html
-http://www.sciencekids.co.nz/images/pictures/flags680/Benin.jpg
-http://www.sciencekids.co.nz/images/pictures/flags680/Argentina.jpg
-
-import colorgram
-import requests
-from PIL import Image
-from io import BytesIO
-r = requests.get('http://www.sciencekids.co.nz/images/pictures/flags680/Argentina.jpg')
-colors = colorgram.extract(BytesIO(r.content), 3)
-colors
