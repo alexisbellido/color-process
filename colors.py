@@ -1,8 +1,39 @@
 # -- coding: utf-8 --
 
-import click
 import yaml
 import json
+
+import click
+from io import BytesIO
+import requests
+import colorgram
+import webcolors
+from PIL import Image
+import cooperhewitt.swatchbook as swatchbook
+
+@click.command()
+@click.option('-u', '--url', help='Image URL')
+def extract_colors(url):
+    click.echo('Extracting colors from {url}'.format(
+        url = url
+    ))
+    r = requests.get(url)
+    colors = colorgram.extract(BytesIO(r.content), 5)
+
+    references = ('css3', 'css4', 'crayola')
+    for reference in references:
+        click.echo("reference: {reference}".format(
+            reference = reference
+        ))
+        ref = swatchbook.load_palette(reference)
+        for color in colors:
+            hex = webcolors.rgb_to_hex((color.rgb.r, color.rgb.g, color.rgb.b))
+            closest = swatchbook.closest(reference, hex)
+            click.echo("hex: {hex} - closest: {closest}".format(
+                hex = hex,
+                closest = closest
+            ))
+            click.echo("============")
 
 @click.command()
 @click.option('-n', '--accession_number', help='Accession number (object number in TMS exports)')
@@ -181,5 +212,4 @@ def extract(environment, dryrun, accession_number=None, input=None):
         click.echo('===========================================================\n')
 
 if __name__ == '__main__':
-    print("miau colors")
-    # extract()
+    extract_colors()
