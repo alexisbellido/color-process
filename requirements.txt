@@ -1,5 +1,7 @@
 colorgram.py==1.1.0
 Flask==1.0.2
+numpy==1.14.3
 requests==2.18.4
 Pillow==5.1.0
 PyYAML==3.12
+git+https://github.com/cooperhewitt/py-cooperhewitt-swatchbook.git#egg=cooperhewitt-swatchbook
