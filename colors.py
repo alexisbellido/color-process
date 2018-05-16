@@ -14,11 +14,28 @@ import cooperhewitt.swatchbook as swatchbook
 @click.command()
 @click.option('-i', '--id', help='Object ID')
 @click.option('-u', '--url', help='Image URL')
-def extract_colors(id, url):
+@click.option('--input', type=click.File('r'), required=False)
+@click.option('--output', type=click.File('w'), required=False)
+def extract_colors(id = None, url = None, input = None, output = None):
     click.echo('Extracting colors for object {id}, image {url}'.format(
         id = id,
         url = url
     ))
+    # TODO so this should just call a module that does all the work so Flask or something else can also call that same module
+    # if you need to provide a global object that’s used by more than one function or file, you can code it in a module that can then be imported by many clients, such as Flask
+    # TODO file processing in different module? Use Click's file?
+    # TODO color processing in different module?
+
+    ids = []
+
+    if id:
+        ids.append(id)
+    elif input:
+        for id in input:
+            ids.append(id.rstrip())
+        input.close()
+    click.echo(ids)
+    exit()
 
     separator = ','
     headings = [
