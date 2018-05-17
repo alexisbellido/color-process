@@ -68,8 +68,11 @@ def extract_colors(id = None, input = None, output = None, environment = 'local'
     c = db.cursor()
     sql = """SELECT tms_id, secret FROM ObjectsImages WHERE object_id = '%s' AND is_primary = 1 ORDER BY tms_id"""
 
+    count = 0;
     for id in ids:
-        click.echo('\nExtracting colors for object {id}'.format(
+        count += 1
+        click.echo('\n{count}. Extracting colors for object {id}'.format(
+            count = count,
             id = id
         ))
         c.execute(sql % (id))
