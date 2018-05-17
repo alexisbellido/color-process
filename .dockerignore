@@ -10,6 +10,7 @@ Dockerfile
 *.pyd
 .Python
 env
+**/config.yaml
 pip-log.txt
 pip-delete-this-directory.txt
 .tox

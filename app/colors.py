@@ -14,74 +14,108 @@ import cooperhewitt.swatchbook as swatchbook
 
 @click.command()
 @click.option('-i', '--id', help='Object ID')
-@click.option('-u', '--url', help='Image URL')
 @click.option('--input', type=click.File('r'), required=False)
 @click.option('--output', type=click.File('w'), required=False)
-def extract_colors(id = None, url = None, input = None, output = None):
-    click.echo('Extracting colors for object {id}, image {url}'.format(
-        id = id,
-        url = url
-    ))
-    # TODO so this should just call a module that does all the work so Flask or something else can also call that same module
-    # if you need to provide a global object that’s used by more than one function or file, you can code it in a module that can then be imported by many clients, such as Flask
-    # TODO file processing in different module? Use Click's file?
-    # TODO color processing in different module?
+@click.option('-e', '--environment', default='local', help='Environment.')
+def extract_colors(id = None, input = None, output = None, environment = 'local'):
 
     ids = []
-
     if id:
         ids.append(id)
     elif input:
         for id in input:
             ids.append(id.rstrip())
         input.close()
-    click.echo(ids)
-    exit() # debug
+
+    if not ids:
+        click.echo('No object IDs passed')
+        exit()
 
     separator = ','
     headings = [
-        'object_id',
-        'url',
-        'palette',
-        'color_1',
-        'closest_1',
-        'color_2',
-        'closest_2',
-        'color_3',
-        'closest_3',
-        'color_4',
-        'closest_4',
-        'color_5',
-        'closest_5'
+    'object_id',
+    'url',
+    'palette',
+    'color_1',
+    'closest_1',
+    'color_2',
+    'closest_2',
+    'color_3',
+    'closest_3',
+    'color_4',
+    'closest_4',
+    'color_5',
+    'closest_5'
     ]
-    click.echo(separator.join(headings))
 
-    r = requests.get(url)
-    colors = colorgram.extract(BytesIO(r.content), 5)
-    references = ('css3', 'css4', 'crayola')
-    for reference in references:
-        # click.echo("reference: {reference}".format(
-        #     reference = reference
-        # ))
-        ref = swatchbook.load_palette(reference)
+    if output:
+        output.write(separator.join(headings) + '\n')
 
-        line = [
-            id,
-            url,
-            reference
-        ]
+    with open('config.yaml', 'r') as f:
+        config = yaml.load(f)
 
-        for color in colors:
-            hex = webcolors.rgb_to_hex((color.rgb.r, color.rgb.g, color.rgb.b))
-            closest = swatchbook.closest(reference, hex)
-            line.extend((hex, closest[0]))
-            # click.echo("hex: {hex} - closest: {closest}".format(
-            #     hex = hex,
-            #     closest = closest
-            # ))
-            # click.echo("============")
+    # MySQL processing
+    # http://mysqlclient.readthedocs.io/user_guide.html#introduction
+    db = MySQLdb.connect(
+        host=config[environment]['mysql']['host'],
+        user=config[environment]['mysql']['username'],
+        passwd=config[environment]['mysql']['password'],
+        db=config[environment]['mysql']['database'],
+        use_unicode=True,
+        charset='utf8'
+    )
 
-        click.echo(separator.join(line))
+    c = db.cursor()
+    sql = """SELECT tms_id, secret FROM ObjectsImages WHERE object_id = '%s' AND is_primary = 1 ORDER BY tms_id"""
+
+    for id in ids:
+        click.echo('\nExtracting colors for object {id}'.format(
+            id = id
+        ))
+        c.execute(sql % (id))
+        row = c.fetchone()
+        if not row:
+            continue
+
+        url = 'https://images.collection.cooperhewitt.org/{tms_id}_{secret}_z.jpg'.format(
+            tms_id = row[0],
+            secret = row[1]
+        )
+        r = requests.get(url)
+
+        if r.status_code != 200:
+            url = 'https://images.collection.cooperhewitt.org/{tms_id}__z.jpg'.format(
+                tms_id = row[0],
+                secret = row[1]
+            )
+            r = requests.get(url)
+
+        try:
+            colors = colorgram.extract(BytesIO(r.content), 5)
+        except OSError:
+            continue
+
+        references = ('css3', 'css4', 'crayola')
+
+        for reference in references:
+            ref = swatchbook.load_palette(reference)
+            line = [
+                id,
+                url,
+                reference
+            ]
+            for color in colors:
+                hex = webcolors.rgb_to_hex((color.rgb.r, color.rgb.g, color.rgb.b))
+                closest = swatchbook.closest(reference, hex)
+                line.extend((hex, closest[0]))
+            if output:
+                output.write(separator.join(line) + '\n')
+            else:
+                click.echo(separator.join(line))
+
+    if output:
+        output.close()
+    db.close()
 
 if __name__ == '__main__':
     extract_colors()

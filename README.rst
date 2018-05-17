@@ -3,6 +3,8 @@ Python, Flask and color processing
 
 Process image colors with `requests <http://docs.python-requests.org/en/latest/user/quickstart/#binary-response-content>`_ and `cologram <https://github.com/obskyr/colorgram.py>`_
 
+Create a config.yaml file with correct settings out of the provided config.yaml.orig provided.
+
 .. code-block:: bash
 
   $ docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t alexisbellido/color-process:0.2 .
@@ -12,7 +14,7 @@ Also see `<https://github.com/alexisbellido/dockerize-django/tree/master/basic-p
 
 .. code-block:: bash
 
-  $ python colors.py --id 136300661 --url https://images.collection.cooperhewitt.org/221332_72430cf94a181603_z.jpg
+  $ python colors.py --id 18140655 -e local
 
 
 TODO
