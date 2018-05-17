@@ -5,6 +5,7 @@ import json
 
 import click
 from io import BytesIO
+import MySQLdb
 import requests
 import colorgram
 import webcolors
@@ -35,7 +36,7 @@ def extract_colors(id = None, url = None, input = None, output = None):
             ids.append(id.rstrip())
         input.close()
     click.echo(ids)
-    exit()
+    exit() # debug
 
     separator = ','
     headings = [

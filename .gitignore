@@ -1,7 +1,8 @@
 *~
 *.pyc
-build
-dist
 .bash_history
-.python_history
 .cache
+.python_history
+build
+config.yaml
+dist

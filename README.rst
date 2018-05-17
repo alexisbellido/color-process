@@ -14,7 +14,8 @@ Also see `<https://github.com/alexisbellido/dockerize-django/tree/master/basic-p
 
   $ python colors.py --id 136300661 --url https://images.collection.cooperhewitt.org/221332_72430cf94a181603_z.jpg
 
+
 TODO
 --------------------------------------------------------
 
-rebuild Docker image to use requirements.txt
+MySQL queries to get image URL from object ID
